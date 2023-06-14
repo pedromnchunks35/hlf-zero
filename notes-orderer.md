@@ -34,3 +34,4 @@ Copy the root tls ca of the intermediate CA and then use this command and the ce
 ```
 fabric-ca-client enroll -d -u https://orderer:12341234@192.168.1.78:7779 --csr.cn orderer --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho,OU=Centro Algoritmi" --csr.hosts "192.168.1.100,orderer" --tls.certfiles tls-cas/int-root-ca.pem --mspdir ../msp
 ```
+## 6. Rename the private key of the identity we just created and also, copy the admin certificate to a directory that you will create called "admincerts". This admin certificate is placed in the client that we created for setting up the CA's, the admin identity in the intermediate CA
