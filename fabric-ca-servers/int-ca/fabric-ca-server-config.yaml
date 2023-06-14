@@ -40,7 +40,7 @@
 version: v1.5.6
 
 # Server's listening port (default: 7054)
-port: 7777
+port: 7779
 
 # Cross-Origin Resource Sharing (CORS)
 cors:
@@ -68,8 +68,8 @@ tls:
   # Enable TLS (default: false)
   enabled: true
   # TLS for the server's listening port
-  certfile:
-  keyfile:
+  certfile: tls/cert.pem
+  keyfile:  tls/key.pem
   clientauth:
     type: noclientcert
     certfiles:
@@ -85,7 +85,7 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name: hospital.tls-ca
+  name: hospital.inter-ca
   # Key file (is only used to import a private key into BCCSP)
   keyfile:
   # Certificate file (default: ca-cert.pem)
@@ -128,7 +128,7 @@ registry:
 
   # Contains identity information which is used when LDAP is disabled
   identities:
-     - name: admin
+     - name: iteradm
        pass: 12341234
        type: client
        affiliation: ""
@@ -268,6 +268,14 @@ signing:
         - digital signature
       expiry: 8760h
     profiles:
+      ca:
+         usage:
+           - cert sign
+           - crl sign
+         expiry: 43800h
+         caconstraint:
+           isca: true
+           maxpathlen: 0
       tls:
          usage:
             - signing
@@ -298,7 +306,7 @@ signing:
 #  if the server creates a self-signed TLS certificate.
 ###########################################################################
 csr:
-   cn: hospital.tls-ca
+   cn: 
    keyrequest:
      algo: ecdsa
      size: 256
@@ -306,15 +314,15 @@ csr:
       - C: PT
         ST: Porto
         L: Aliados
-        O: Universidade do minho
+        O: Universidade do Minho
         OU: Centro Algoritmi
    hosts:
-     - hospital.tls-ca
-     - localhost
      - 192.168.1.78
+     - hospital.inter-ca
+     - localhost
    ca:
       expiry: 131400h
-      pathlength: 1
+      pathlength: 0
 
 ###########################################################################
 # Each CA can issue both X509 enrollment certificate as well as Idemix
@@ -421,16 +429,16 @@ cafiles:
 #############################################################################
 intermediate:
   parentserver:
-    url:
-    caname:
+    url: https://interadm:12341234@localhost:7778
+    caname: hospital.org1-ca
 
   enrollment:
-    hosts:
-    profile:
+    hosts: localhost
+    profile: ca
     label:
 
   tls:
-    certfiles:
+    certfiles: tls/tls-ca-cert.pem
     client:
       certfile:
       keyfile:
@@ -446,7 +454,6 @@ intermediate:
 cfg:
   identities:
     passwordattempts: 10
-    allowremove: true
 
 ###############################################################################
 #
@@ -455,7 +462,7 @@ cfg:
 ###############################################################################
 operations:
     # host and port for the operations server
-    listenAddress: 127.0.0.1:9443
+    listenAddress: 127.0.0.1:9445
 
     # TLS configuration for the operations endpoint
     tls:

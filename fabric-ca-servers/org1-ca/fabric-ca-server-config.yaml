@@ -40,13 +40,13 @@
 version: v1.5.6
 
 # Server's listening port (default: 7054)
-port: 7777
+port: 7778
 
 # Cross-Origin Resource Sharing (CORS)
 cors:
-    enabled: false
-    origins:
-      - "*"
+  enabled: false
+  origins:
+    - "*"
 
 # Enables debug logging (default: false)
 debug: false
@@ -68,8 +68,8 @@ tls:
   # Enable TLS (default: false)
   enabled: true
   # TLS for the server's listening port
-  certfile:
-  keyfile:
+  keyfile: tls/key.pem
+  certfile: tls/cert.pem
   clientauth:
     type: noclientcert
     certfiles:
@@ -85,7 +85,7 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name: hospital.tls-ca
+  name: hospital.org1-ca
   # Key file (is only used to import a private key into BCCSP)
   keyfile:
   # Certificate file (default: ca-cert.pem)
@@ -128,18 +128,18 @@ registry:
 
   # Contains identity information which is used when LDAP is disabled
   identities:
-     - name: admin
-       pass: 12341234
-       type: client
-       affiliation: ""
-       attrs:
-          hf.Registrar.Roles: "*"
-          hf.Registrar.DelegateRoles: "*"
-          hf.Revoker: true
-          hf.IntermediateCA: true
-          hf.GenCRL: true
-          hf.Registrar.Attributes: "*"
-          hf.AffiliationMgr: true
+    - name: org1ca
+      pass: 12341234
+      type: client
+      affiliation: ""
+      attrs:
+        hf.Registrar.Roles: "*"
+        hf.Registrar.DelegateRoles: "*"
+        hf.Revoker: true
+        hf.IntermediateCA: true
+        hf.GenCRL: true
+        hf.Registrar.Attributes: "*"
+        hf.AffiliationMgr: true
 
 #############################################################################
 #  Database section
@@ -155,11 +155,11 @@ db:
   type: sqlite3
   datasource: fabric-ca-server.db
   tls:
-      enabled: false
-      certfiles:
-      client:
-        certfile:
-        keyfile:
+    enabled: false
+    certfiles:
+    client:
+      certfile:
+      keyfile:
 
 #############################################################################
 #  LDAP section
@@ -169,57 +169,57 @@ db:
 #  2) To retrieve identity attributes
 #############################################################################
 ldap:
-   # Enables or disables the LDAP client (default: false)
-   # If this is set to true, the "registry" section is ignored.
-   enabled: false
-   # The URL of the LDAP server
-   url: ldap://<adminDN>:<adminPassword>@<host>:<port>/<base>
-   # TLS configuration for the client connection to the LDAP server
-   tls:
-      certfiles:
-      client:
-         certfile:
-         keyfile:
-   # Attribute related configuration for mapping from LDAP entries to Fabric CA attributes
-   attribute:
-      # 'names' is an array of strings containing the LDAP attribute names which are
-      # requested from the LDAP server for an LDAP identity's entry
-      names: ['uid','member']
-      # The 'converters' section is used to convert an LDAP entry to the value of
-      # a fabric CA attribute.
-      # For example, the following converts an LDAP 'uid' attribute
-      # whose value begins with 'revoker' to a fabric CA attribute
-      # named "hf.Revoker" with a value of "true" (because the boolean expression
-      # evaluates to true).
-      #    converters:
-      #       - name: hf.Revoker
-      #         value: attr("uid") =~ "revoker*"
-      converters:
-         - name:
-           value:
-      # The 'maps' section contains named maps which may be referenced by the 'map'
-      # function in the 'converters' section to map LDAP responses to arbitrary values.
-      # For example, assume a user has an LDAP attribute named 'member' which has multiple
-      # values which are each a distinguished name (i.e. a DN). For simplicity, assume the
-      # values of the 'member' attribute are 'dn1', 'dn2', and 'dn3'.
-      # Further assume the following configuration.
-      #    converters:
-      #       - name: hf.Registrar.Roles
-      #         value: map(attr("member"),"groups")
-      #    maps:
-      #       groups:
-      #          - name: dn1
-      #            value: peer
-      #          - name: dn2
-      #            value: client
-      # The value of the user's 'hf.Registrar.Roles' attribute is then computed to be
-      # "peer,client,dn3".  This is because the value of 'attr("member")' is
-      # "dn1,dn2,dn3", and the call to 'map' with a 2nd argument of
-      # "group" replaces "dn1" with "peer" and "dn2" with "client".
-      maps:
-         groups:
-            - name:
-              value:
+  # Enables or disables the LDAP client (default: false)
+  # If this is set to true, the "registry" section is ignored.
+  enabled: false
+  # The URL of the LDAP server
+  url: ldap://<adminDN>:<adminPassword>@<host>:<port>/<base>
+  # TLS configuration for the client connection to the LDAP server
+  tls:
+    certfiles:
+    client:
+      certfile:
+      keyfile:
+  # Attribute related configuration for mapping from LDAP entries to Fabric CA attributes
+  attribute:
+    # 'names' is an array of strings containing the LDAP attribute names which are
+    # requested from the LDAP server for an LDAP identity's entry
+    names: ["uid", "member"]
+    # The 'converters' section is used to convert an LDAP entry to the value of
+    # a fabric CA attribute.
+    # For example, the following converts an LDAP 'uid' attribute
+    # whose value begins with 'revoker' to a fabric CA attribute
+    # named "hf.Revoker" with a value of "true" (because the boolean expression
+    # evaluates to true).
+    #    converters:
+    #       - name: hf.Revoker
+    #         value: attr("uid") =~ "revoker*"
+    converters:
+      - name:
+        value:
+    # The 'maps' section contains named maps which may be referenced by the 'map'
+    # function in the 'converters' section to map LDAP responses to arbitrary values.
+    # For example, assume a user has an LDAP attribute named 'member' which has multiple
+    # values which are each a distinguished name (i.e. a DN). For simplicity, assume the
+    # values of the 'member' attribute are 'dn1', 'dn2', and 'dn3'.
+    # Further assume the following configuration.
+    #    converters:
+    #       - name: hf.Registrar.Roles
+    #         value: map(attr("member"),"groups")
+    #    maps:
+    #       groups:
+    #          - name: dn1
+    #            value: peer
+    #          - name: dn2
+    #            value: client
+    # The value of the user's 'hf.Registrar.Roles' attribute is then computed to be
+    # "peer,client,dn3".  This is because the value of 'attr("member")' is
+    # "dn1,dn2,dn3", and the call to 'map' with a 2nd argument of
+    # "group" replaces "dn1" with "peer" and "dn2" with "client".
+    maps:
+      groups:
+        - name:
+          value:
 
 #############################################################################
 # Affiliations section. Fabric CA server can be bootstrapped with the
@@ -242,9 +242,9 @@ ldap:
 # which are always stored in lower case.
 #############################################################################
 affiliations:
-   org1:
-      - doctor
-      - nurse
+  org1:
+    - doctor
+    - nurse
 
 #############################################################################
 #  Signing section
@@ -263,19 +263,28 @@ affiliations:
 #  the default expiration ("expiry" field) is "8760h", which is 1 year in hours.
 #############################################################################
 signing:
-    default:
+  default:
+    usage:
+      - digital signature
+    expiry: 8760h
+  profiles:
+    ca:
       usage:
-        - digital signature
+        - cert sign
+        - crl sign
+      expiry: 43800h
+      caconstraint:
+        isca: true
+        maxpathlen: 1
+        maxpathlenzero: false
+    tls:
+      usage:
+        - signing
+        - key encipherment
+        - server auth
+        - client auth
+        - key agreement
       expiry: 8760h
-    profiles:
-      tls:
-         usage:
-            - signing
-            - key encipherment
-            - server auth
-            - client auth
-            - key agreement
-         expiry: 8760h
 
 ###########################################################################
 #  Certificate Signing Request (CSR) section.
@@ -284,7 +293,8 @@ signing:
 #  "ca.expiry" field below, whose default value is "131400h" which is
 #  15 years in hours.
 #  The pathlength field is used to limit CA certificate hierarchy as described
-#  in section 4.2.1.9 of RFC 5280.
+#  in section 4.2.
+maxpathlenzero: false.9 of RFC 5280.
 #  Examples:
 #  1) No pathlength value means no limit is requested.
 #  2) pathlength == 1 means a limit of 1 is requested which is the default for
@@ -298,23 +308,23 @@ signing:
 #  if the server creates a self-signed TLS certificate.
 ###########################################################################
 csr:
-   cn: hospital.tls-ca
-   keyrequest:
-     algo: ecdsa
-     size: 256
-   names:
-      - C: PT
-        ST: Porto
-        L: Aliados
-        O: Universidade do minho
-        OU: Centro Algoritmi
-   hosts:
-     - hospital.tls-ca
-     - localhost
-     - 192.168.1.78
-   ca:
-      expiry: 131400h
-      pathlength: 1
+  cn: hospital.org1-ca
+  keyrequest:
+    algo: ecdsa
+    size: 256
+  names:
+    - C: PT
+      ST: Porto
+      L: Aliados
+      O: Universidade do minho
+      OU: Centro Algoritmi
+  hosts:
+    - hospital.org1-ca
+    - 192.168.1.78
+    - localhost
+  ca:
+    expiry: 131400h
+    pathlength: 1
 
 ###########################################################################
 # Each CA can issue both X509 enrollment certificate as well as Idemix
@@ -350,13 +360,13 @@ idemix:
 # crypto library implementation to use
 #############################################################################
 bccsp:
-    default: SW
-    sw:
-        hash: SHA2
-        security: 256
-        filekeystore:
-            # The directory used for the software file-based keystore
-            keystore: msp/keystore
+  default: SW
+  sw:
+    hash: SHA2
+    security: 256
+    filekeystore:
+      # The directory used for the software file-based keystore
+      keystore: msp/keystore
 
 #############################################################################
 # Multi CA section
@@ -446,7 +456,6 @@ intermediate:
 cfg:
   identities:
     passwordattempts: 10
-    allowremove: true
 
 ###############################################################################
 #
@@ -454,28 +463,28 @@ cfg:
 #
 ###############################################################################
 operations:
-    # host and port for the operations server
-    listenAddress: 127.0.0.1:9443
+  # host and port for the operations server
+  listenAddress: 127.0.0.1:9444
 
-    # TLS configuration for the operations endpoint
-    tls:
-        # TLS enabled
-        enabled: false
+  # TLS configuration for the operations endpoint
+  tls:
+    # TLS enabled
+    enabled: false
 
-        # path to PEM encoded server certificate for the operations server
-        cert:
-            file:
+    # path to PEM encoded server certificate for the operations server
+    cert:
+      file:
 
-        # path to PEM encoded server key for the operations server
-        key:
-            file:
+    # path to PEM encoded server key for the operations server
+    key:
+      file:
 
-        # require client certificate authentication to access all resources
-        clientAuthRequired: false
+    # require client certificate authentication to access all resources
+    clientAuthRequired: false
 
-        # paths to PEM encoded ca certificates to trust for client authentication
-        clientRootCAs:
-            files: []
+    # paths to PEM encoded ca certificates to trust for client authentication
+    clientRootCAs:
+      files: []
 
 ###############################################################################
 #
@@ -483,20 +492,20 @@ operations:
 #
 ###############################################################################
 metrics:
-    # statsd, prometheus, or disabled
-    provider: disabled
+  # statsd, prometheus, or disabled
+  provider: disabled
 
-    # statsd configuration
-    statsd:
-        # network type: tcp or udp
-        network: udp
+  # statsd configuration
+  statsd:
+    # network type: tcp or udp
+    network: udp
 
-        # statsd server address
-        address: 127.0.0.1:8125
+    # statsd server address
+    address: 127.0.0.1:8125
 
-        # the interval at which locally cached counters and gauges are pushed
-        # to statsd; timings are pushed immediately
-        writeInterval: 10s
+    # the interval at which locally cached counters and gauges are pushed
+    # to statsd; timings are pushed immediately
+    writeInterval: 10s
 
-        # prefix is prepended to all emitted statsd metrics
-        prefix: server
+    # prefix is prepended to all emitted statsd metrics
+    prefix: server

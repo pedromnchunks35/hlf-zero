@@ -40,12 +40,12 @@
 #############################################################################
 
 # URL of the Fabric-ca-server (default: http://localhost:7054)
-url: https://localhost:7777
+url: https://localhost:7779
 
 # Membership Service Provider (MSP) directory
 # This is useful when the client is used to enroll a peer or orderer, so
 # that the enrollment artifacts are stored in the format expected by MSP.
-mspdir: tls-ca/tlsadmin/msp
+mspdir: int-ca/iteradm/msp
 
 #############################################################################
 #    TLS section for secure socket connection
@@ -104,18 +104,18 @@ tls:
 #
 #############################################################################
 csr:
-  cn: admin
+  cn: interadm
   keyrequest:
     algo: ecdsa
     size: 256
     reusekey: false
   serialnumber:
   names:
-    - C: PT
-      ST: Porto
-      L: Aliados
-      O: Universidade do minho
-      OU: Centro Algoritmi
+    - C: US
+      ST: North Carolina
+      L:
+      O: Hyperledger
+      OU: Fabric
   hosts:
     - pedro-gf63thin9sc
 
