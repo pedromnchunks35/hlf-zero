@@ -245,3 +245,27 @@ The file has the following structure:
         Type: ImplicitMeta
         Rule: "MAJORITY Endorsement"
   ```
+
+# Notes about roles
+The Role is specified in the OU
+To enable NodeOUs, we need to create a confix.yaml file with this information: (we can also give different names to the entities)
+```
+NodeOUs:
+  Enable: true
+  ClientOUIdentifier:
+    Certificate: cacerts/ca.sampleorg-cert.pem
+    OrganizationalUnitIdentifier: <CLIENT-OU-NAME>
+  PeerOUIdentifier:
+    Certificate: cacerts/ca.sampleorg-cert.pem
+    OrganizationalUnitIdentifier: <PEER-OU-NAME>
+  AdminOUIdentifier:
+    Certificate: cacerts/ca.sampleorg-cert.pem
+    OrganizationalUnitIdentifier: <ADMIN-OU-NAME>
+  OrdererOUIdentifier:
+    Certificate: cacerts/ca.sampleorg-cert.pem
+    OrganizationalUnitIdentifier: <ORDERER-OU-NAME>
+```
+The distinctions between departments is maded using affiliations
+![Affiliations](assets-notes-channel-config/certificate-with-type-and-affiliations.png)
+
+As you can see in this photo, we enrolled a certificate with a type of entitie as admin, and affiliations of org1.doctor type and thats the result of that creation.

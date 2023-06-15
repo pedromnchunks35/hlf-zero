@@ -130,7 +130,7 @@ registry:
   identities:
      - name: admin
        pass: 12341234
-       type: client
+       type: admin
        affiliation: ""
        attrs:
           hf.Registrar.Roles: "*"

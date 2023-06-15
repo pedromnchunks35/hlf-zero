@@ -18,24 +18,31 @@ Note that the intermediate CA certificate is verifyied by the TLS CA.
 3. Register the peer1 in the intermediate CA
 For register, go to the client that we setted in the host machine that already has the admin msp and use the following command:
 ```
-fabric-ca-client register -d -u https://localhost:7779 --id.name peer1 --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho,OU=Centro Algoritmi" --csr.cn peer1 --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
+fabric-ca-client register -d -u https://localhost:7779 --id.type peer --id.affiliations org1.doctor --id.name peer1 --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital,OU=Medic" --csr.hosts "192.168.1.100,peer1" --csr.cn peer1 --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
 ``` 
 4. Enroll on the virtual machine side, the certificate for this org1
 ```
-fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7779 --csr.cn peer1 --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho,OU=Centro Algoritmi" --tls.certfiles tls-cas/int-root-ca.pem --mspdir ../msp
+fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7779 --id.type peer --id.affiliations org1.doctor  --csr.cn peer1 --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital,OU=Medic" --csr.hosts "192.168.1.100,peer1" --tls.certfiles tls-cas/int-root-ca.pem --mspdir ../msp
 ```
 5. Register the tls certificate for the peer1 (also in the host machine)
 ```
-fabric-ca-client register -d -u https://localhost:7777 --id.name peer1 --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho,OU=Centro Algoritmi" --csr.cn peer1
+fabric-ca-client register -d -u https://localhost:7777 --id.name peer1 --id.secret 12341234 --id.type peer --id.affiliations org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital,OU=Medic" --csr.cn peer1
 --csr.hosts "192.168.1.100,peer1" --tls.certfiles tls-root-cert/tls-ca-cert.pem --mspdir ../msp
 ```
 6. Enroll the tls certificate for the peer1 (in the virtual machine side)
 ```
-fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7777 --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho,OU=Centro Algoritmi" --csr.cn peer1
---csr.hosts "192.168.1.100,peer1" --tls.certfiles tls-cas/tls-root-ca.pem --mspdir ../tls-msp --enrollment.profile tls
+fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7777 --id.type peer --id.affiliations org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital,OU=Medic" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1" --tls.certfiles tls-cas/tls-root-ca.pem --mspdir ../tls-msp --enrollment.profile tls
 ```
-1. Copy the intermediate adm signed certificate to the directory inside of msp called "admincerts", note that this certificate got generated in the client we created uppon establishing the CA's
-
+8. Register a new adm identity with the hf.Role as administrator
+```
+fabric-ca-client register -d -u https://localhost:7779 --id.type admin --id.name adm-iter --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho,OU=Centro Algoritmi" --csr.cn adm-iter --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
+``` 
+9. Enroll the new adm identity for use in both peer1 and peer2 (on creating the peer2 , we skip the registration and in the enroll step, we just go to the client and copy the certificate)
+```
+fabric-ca-client enroll -d -u https://adm-iter:12341234@localhost:7779 --id.type admin --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho,OU=Centro Algoritmi" --csr.cn adm-iter --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/identity-adm-role-based
+```
+10. Do the steps 1-6 to the peer2, changing the port of the host, the csr.hosts, the name of the peer and the affiliations (dont forget to copy the adm certificate to it)
+11. To enable the NodeOUs, you need to put a config.yaml file inside of the msp (check the notes of the channel to do that)
 ## 3. Know where resides the TLS private key and create an folder called admincerts to put the admin certificate in it
 On this step, we should know, which private key is related to the tls certificate that we have. In forder to do that we can do as follow:
 ```

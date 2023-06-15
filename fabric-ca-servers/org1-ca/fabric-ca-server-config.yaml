@@ -130,7 +130,7 @@ registry:
   identities:
     - name: org1ca
       pass: 12341234
-      type: client
+      type: admin
       affiliation: ""
       attrs:
         hf.Registrar.Roles: "*"
@@ -456,7 +456,7 @@ intermediate:
 cfg:
   identities:
     passwordattempts: 10
-
+    allowremove: true
 ###############################################################################
 #
 #    Operations section
