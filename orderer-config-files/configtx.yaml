@@ -13,7 +13,7 @@
 #
 ################################################################################
 Organizations:
-    # SampleOrg defines an MSP using the sampleconfig.  It should never be used
+    # Org1MSP defines an MSP using the sampleconfig.  It should never be used
     # in production but may be used as a template for other definitions
     - &Orderer
         # DefaultOrg defines the organization which is used in the sampleconfig
@@ -24,7 +24,7 @@ Organizations:
         ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
-        MSPDir: ./org1/orderer/msp
+        MSPDir: ../org1/orderer/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -51,7 +51,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org1MSP
 
-        MSPDir: ./org1/msp
+        MSPDir: ../org1/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -59,16 +59,16 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('org1MSP.admin', 'org1MSP.peer', 'org1MSP.client')"
+                Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('org1MSP.admin', 'org1MSP.client')"
+                Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('org1MSP.admin')"
+                Rule: "OR('Org1MSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('org1MSP.peer')"
+                Rule: "OR('Org1MSP.peer')"
         # Anchor peers
         AnchorPeers:
             - Host: 192.168.1.100
@@ -145,7 +145,7 @@ Application: &ApplicationDefaults
     # Organizations is the list of orgs which are defined as participants on
     # the application side of the network
     Organizations:
-
+        - <<: *Org1
     # Policies defines the set of policies at this level of the config tree
     # For Application policies, their canonical path is
     #   /Channel/Application/<PolicyName>
@@ -193,8 +193,8 @@ Orderer: &OrdererDefaults
         Consenters:
         - Host: 192.168.1.101
           Port: 7050
-          ClientTLSCert: ./org1/orderer/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ./org1/orderer/tls-msp/signcerts/cert.pem
+          ClientTLSCert: ../org1/orderer/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ../org1/orderer/tls-msp/signcerts/cert.pem
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
@@ -217,7 +217,7 @@ Orderer: &OrdererDefaults
     # Organizations is the list of orgs which are defined as participants on
     # the orderer side of the network
     Organizations:
-
+        <<: *Orderer
     # Policies defines the set of policies at this level of the config tree
     # For Orderer policies, their canonical path is
     #   /Channel/Orderer/<PolicyName>
@@ -278,25 +278,60 @@ Channel: &ChannelDefaults
 #
 ################################################################################
 Profiles:
-    Genesis:
-        <<: *ChannelDefaults
-        Orderer: 
-            <<: *OrdererDefaults
-            Organizations:
-                - *Orderer
-            Capabilities:
-                <<: *OrdererCapabilities
-        Consortiums:
-            SampleConsortium:
-                Organizations:
-                    - *Org1
-    
     Channel:
-        Consortium: SampleConsortium
         <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+        Application:
+            <<: *ApplicationDefaults
+     # SampleAppChannelEtcdRaft defines an application channel configuration
+    # that uses the etcd/raft-based orderer.
+    Sample:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            OrdererType: etcdraft
+            Organizations:
+                - <<: *Orderer
+                  Policies:
+                      Readers:
+                        Type: Signature
+                        Rule: "OR('OrdererMSP.member')"
+                # If your MSP is configured with the new NodeOUs, you might
+                # want to use a more specific rule like the following:
+                # Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+                        Writers:
+                            Type: Signature
+                            Rule: "OR('OrdererMSP.member')"
+                # If your MSP is configured with the new NodeOUs, you might
+                # want to use a more specific rule like the following:
+                # Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+                        Admins:
+                            Type: Signature
+                            Rule: "OR('OrdererMSP.admin','OrdererMSP.member')"
+                        Endorsement:
+                            Type: Signature
+                            Rule: "OR('OrdererMSP.member')"
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *Org1
-            Capabilities:
-                <<: *ApplicationCapabilities
+                - <<: *Org1
+                  Policies:
+                      Readers:
+                        Type: Signature
+                        Rule: "OR('Org1MSP.member')"
+                # If your MSP is configured with the new NodeOUs, you might
+                # want to use a more specific rule like the following:
+                # Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+                        Writers:
+                            Type: Signature
+                            Rule: "OR('Org1MSP.member')"
+                # If your MSP is configured with the new NodeOUs, you might
+                # want to use a more specific rule like the following:
+                # Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+                        Admins:
+                            Type: Signature
+                            Rule: "OR('Org1MSP.admin','Org1MSP.member')"
+                        Endorsement:
+                            Type: Signature
+                            Rule: "OR('Org1MSP.member')"

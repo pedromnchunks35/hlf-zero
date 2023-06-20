@@ -18,19 +18,19 @@ Note that the intermediate CA certificate is verifyied by the TLS CA.
 3. Register the peer1 in the intermediate CA
 For register, go to the client that we setted in the host machine that already has the admin msp and use the following command:
 ```
-fabric-ca-client register -d -u https://localhost:7779 --id.type peer --id.affiliation org1.doctor --id.name peer1 --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.hosts "192.168.1.100,peer1" --csr.cn peer1 --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
+fabric-ca-client register -d -u https://localhost:7779 --id.type peer --id.affiliation org1.doctor --id.name peer1 --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.hosts "192.168.1.100,peer1,127.0.0.1" --csr.cn peer1 --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
 ``` 
 4. Enroll on the virtual machine side, the certificate for this org1
 ```
-fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7779 --id.type peer --id.affiliation org1.doctor  --csr.cn peer1 --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.hosts "192.168.1.100,peer1" --tls.certfiles tls-cas/int-root-ca.pem --mspdir ../msp
+fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7779 --id.type peer --id.affiliation org1.doctor  --csr.cn peer1 --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.hosts "192.168.1.100,peer1,127.0.0.1" --tls.certfiles tls-cas/int-root-ca.pem --mspdir ../msp
 ```
 5. Register the tls certificate for the peer1 (also in the host machine)
 ```
-fabric-ca-client register -d -u https://localhost:7777 --id.name peer1 --id.secret 12341234 --id.type peer --id.affiliation org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1" --tls.certfiles tls-root-cert/tls-ca-cert.pem --enrollment.profile tls --mspdir tls-ca/tlsadmin/msp/
+fabric-ca-client register -d -u https://localhost:7777 --id.name peer1 --id.secret 12341234 --id.type peer --id.affiliation org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1,127.0.0.1" --tls.certfiles tls-root-cert/tls-ca-cert.pem --enrollment.profile tls --mspdir tls-ca/tlsadmin/msp/
 ```
 6. Enroll the tls certificate for the peer1 (in the virtual machine side)
 ```
-fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7777 --id.type peer --id.affiliation org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1" --tls.certfiles tls-cas/tls-root-ca.pem --mspdir ../tls-msp --enrollment.profile tls
+fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7777 --id.type peer --id.affiliation org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1,127.0.0.1" --tls.certfiles tls-cas/tls-root-ca.pem --mspdir ../tls-msp --enrollment.profile tls
 ```
 8. Register a new adm identity with the hf.Role as administrator
 ```
@@ -89,7 +89,6 @@ Note , you change the CORE_PEER_GOSSIP_EXTERNALENDPOINT which is the ip address 
 docker run \
   --name peer1 \
   -p 7050:7051 \
-  -p 7052:7052 \
   -e CORE_PEER_ID=peer1 \
   -e CORE_PEER_ADDRESS=127.0.0.1:7051 \
   -e CORE_PEER_LOCALMSPID=org1MSP \
