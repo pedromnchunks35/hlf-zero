@@ -1,5 +1,0 @@
-  NodeOUs:
-  Enable: true
-  AdminOUIdentifier:
-    Certificate: intermediatecerts/localhost-7779.pem
-    OrganizationalUnitIdentifier: admin
