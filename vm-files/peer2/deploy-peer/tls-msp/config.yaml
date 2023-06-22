@@ -1,0 +1,14 @@
+NodeOUs:
+  Enable: true
+  ClientOUIdentifier:
+    Certificate: tlscacerts/tls-192-168-1-78-7777.pem
+    OrganizationalUnitIdentifier: client
+  PeerOUIdentifier:
+    Certificate: tlscacerts/tls-192-168-1-78-7777.pem
+    OrganizationalUnitIdentifier: peer
+  AdminOUIdentifier:
+    Certificate: tlscacerts/tls-192-168-1-78-7777.pem
+    OrganizationalUnitIdentifier: admin
+  OrdererOUIdentifier:
+    Certificate: tlscacerts/tls-192-168-1-78-7777.pem
+    OrganizationalUnitIdentifier: orderer

@@ -88,7 +88,7 @@ Note , you change the CORE_PEER_GOSSIP_EXTERNALENDPOINT which is the ip address 
 ```
 docker run \
   --name peer1 \
-  -p 7050:7051 \
+  -p 7051:7051 \
   -e CORE_PEER_ID=peer1 \
   -e CORE_PEER_ADDRESS=127.0.0.1:7051 \
   -e CORE_PEER_LOCALMSPID=org1MSP \

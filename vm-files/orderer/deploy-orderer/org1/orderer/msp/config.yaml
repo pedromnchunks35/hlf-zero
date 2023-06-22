@@ -1,0 +1,15 @@
+NodeOUs:
+  Enable: true
+  ClientOUIdentifier:
+    Certificate: intermediatecerts/192-168-1-78-7779.pem
+    OrganizationalUnitIdentifier: client
+  PeerOUIdentifier:
+    Certificate: intermediatecerts/192-168-1-78-7779.pem
+    OrganizationalUnitIdentifier: peer
+  AdminOUIdentifier:
+    Certificate: intermediatecerts/192-168-1-78-7779.pem
+    OrganizationalUnitIdentifier: admin
+  OrdererOUIdentifier:
+    Certificate: intermediatecerts/192-168-1-78-7779.pem
+    OrganizationalUnitIdentifier: orderer
+
