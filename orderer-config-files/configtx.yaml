@@ -29,10 +29,10 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+                Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client','Org1MSP.orderer')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+                Rule: "OR('Org1MSP.admin', 'Org1MSP.client','Org1MSP.peer','Org1MSP.orderer')"
             Admins:
                 Type: Signature
                 Rule: "OR('Org1MSP.admin')"
@@ -41,7 +41,7 @@ Organizations:
                 Rule: "OR('Org1MSP.peer')"
 
         OrdererEndpoints:
-            - 127.0.0.1:7050 
+            - 192.168.1.101:7050 
 
         # Anchor peers
         AnchorPeers:
@@ -158,11 +158,11 @@ Orderer: &OrdererDefaults
     # as TLS validation.  The preferred way to specify orderer addresses is now
     # to include the OrdererEndpoints item in your org definition
     Addresses:
-        - 127.0.0.1:7050
+        - 192.168.1.101:7050 
 
     EtcdRaft:
         Consenters:
-        - Host: 127.0.0.1
+        - Host: 192.168.1.101
           Port: 7050
           ClientTLSCert: ../org1/orderer/tls-msp/signcerts/cert.pem
           ServerTLSCert: ../org1/orderer/tls-msp/signcerts/cert.pem

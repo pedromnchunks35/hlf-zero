@@ -4,12 +4,16 @@ Inside of the root folder where you will deploy the peer, you need to have the f
 
 (This is personal configuration for using a client ca to get the needed certificates)
 ```
+├── config
+├── data-vault
+├── snapshots
+├── chaincode
 ├── ca-client
             └── tls-cas
 ```
 
 ## 2. Generate the needed cryptographic materials
-To generate the cryptographic materials, we need 2 certificates that we once generated for the CA's. The root CA for the intermediate CA and other for the TLS CA. Because we need to enroll the admin of the org1 and also we need the TLS certificates for the communication.
+To generate the cryptographic materials, we need 2 certificates that we once generated for the CA's. The root TLS CA for the intermediate CA and other for the TLS CA. Because we need to enroll the admin of the org1 and also we need the TLS certificates for the communication.
 
 Note that the intermediate CA certificate is verifyied by the TLS CA.
 
@@ -18,7 +22,7 @@ Note that the intermediate CA certificate is verifyied by the TLS CA.
 3. Register the peer1 in the intermediate CA
 For register, go to the client that we setted in the host machine that already has the admin msp and use the following command:
 ```
-fabric-ca-client register -d -u https://localhost:7779 --id.type peer --id.affiliation org1.doctor --id.name peer1 --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.hosts "192.168.1.100,peer1,127.0.0.1" --csr.cn peer1 --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
+fabric-ca-client register -d -u https://localhost:7779 --id.type peer --id.affiliation org1.doctor --id.name peer1 --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.hosts "192.168.1.100,peer1,127.0.0.1,172.17.0.2" --csr.cn peer1 --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
 ``` 
 4. Enroll on the virtual machine side, the certificate for this org1
 ```
@@ -26,88 +30,65 @@ fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7779 --id.type
 ```
 5. Register the tls certificate for the peer1 (also in the host machine)
 ```
-fabric-ca-client register -d -u https://localhost:7777 --id.name peer1 --id.secret 12341234 --id.type peer --id.affiliation org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1,127.0.0.1" --tls.certfiles tls-root-cert/tls-ca-cert.pem --enrollment.profile tls --mspdir tls-ca/tlsadmin/msp/
+fabric-ca-client register -d -u https://localhost:7777 --id.name peer1 --id.secret 12341234 --id.type peer --id.affiliation org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1,127.0.0.1,172.17.0.2" --tls.certfiles tls-root-cert/tls-ca-cert.pem --enrollment.profile tls --mspdir tls-ca/tlsadmin/msp/
 ```
 6. Enroll the tls certificate for the peer1 (in the virtual machine side)
 ```
-fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7777 --id.type peer --id.affiliation org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1,127.0.0.1" --tls.certfiles tls-cas/tls-root-ca.pem --mspdir ../tls-msp --enrollment.profile tls
+fabric-ca-client enroll -d -u https://peer1:12341234@192.168.1.78:7777 --id.type peer --id.affiliation org1.doctor  --csr.names "C=PT,ST=Porto,L=Aliados,O=Hospital" --csr.cn peer1 --csr.hosts "192.168.1.100,peer1,127.0.0.1,172.17.0.2" --tls.certfiles tls-cas/tls-root-ca.pem --mspdir ../tls-msp --enrollment.profile tls
 ```
-8. Register a new adm identity with the hf.Role as administrator
+7. Register the adm identity for intermediate CA
+In this step you will also need to go to the client that we setted up in the intermediate CA
 ```
-fabric-ca-client register -d -u https://localhost:7779 --id.type admin --id.name adm-iter --id.secret 12341234 --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn adm-iter --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
-``` 
-9. Enroll the new adm identity for use in both peer1 and peer2 (on creating the peer2 , we skip the registration and in the enroll step, we just go to the client and copy the certificate)
+fabric-ca-client register -d -u https://localhost:7779 --id.name adm-iter --id.secret 12341234 --id.type admin --id.affiliation org1 --csr.names  "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
 ```
-fabric-ca-client enroll -d -u https://adm-iter:12341234@localhost:7779 --id.type admin --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn adm-iter --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/identity-adm-role-based
+9. Enroll the adm identity for the intermediate CA
 ```
-10. Do the steps 1-6 to the peer2, changing the port of the host, the csr.hosts, the name of the peer and the affiliations (dont forget to copy the adm certificate to it)
-11. To enable the NodeOUs, you need to put a config.yaml file inside of the msp (check the notes of the channel to do that)
-## 3. Know where resides the TLS private key and create an folder called admincerts to put the admin certificate in it
-On this step, we should know, which private key is related to the tls certificate that we have. In forder to do that we can do as follow:
+fabric-ca-client enroll -d -u https://adm-iter:12341234@localhost:7779 --id.type admin --id.affiliation org1 --csr.names --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir msp/admin/msp
 ```
-1-> We create a file with content inside like a .txt file
-
-2-> We use this command for every private key to create a signature per private key:
-
-    openssl dgst -sha256 -sign key1.pem -out ../signcerts/1.bin teste.txt
-        
-        notes:
-        - key1.pem , is the private key from we will create the signature
-        - ../signcerts/1.bin is , is the path and also the name of the signature that needs to end with a .bin
-        - teste.txt, is the file that we want to sign on
-
-3-> We extract the public key from the certificate:
-    
-    openssl x509 -pubkey -noout -in cert.pem > pubkey.pem
-
-        notes:
-        - cert.pem, is the certificate
-        - pubkey.pem, is the public key that will be generated
-
-4-> Verify signature with public key:
-
-    openssl dgst -sha256 -verify pubkey.pem -signature 1.bin ../keystore/teste.txt
-
-        notes:
-        - pubkey.pem, is the public key that we extracted before
-        - 1.bin, is the signature that we generated before
-        - ../keystore/teste.txt is the file that got generated
+8. Register the adm identity for tls CA
 ```
+fabric-ca-client register -d -u https://localhost:7777 --id.name adm --id.secret 12341234 --id.type admin --id.affiliation org1 --csr.names  "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
+```
+9. Enroll the adm identity for tls CA
+```
+fabric-ca-client enroll -d -u https://adm:12341234@localhost:7777  --id.type admin --id.affiliation org1 --csr.names  "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir tls-msp/admin/msp
+```
+10. Extract chaincode-go from fabric-samples
+Go to asset-transfer-basic/chaincode-go and run this command
+```
+GO111MODULE=on go mod vendor
+```
+After that pick the chaincode-go dir and paste it inside of the chaincode folder in the peer1. Since it is inside of a machine use the "sftp" command. (This is a suggestion)
 
-On the forth step, it will either throw an error in case they dont match or success case it matches, case it matches we want to use that private key.
-Inside of the msp generated by the TLS CA, we should create a directory called "admincerts". Move the intermediate CA admin certificate that we generated once in the client we created once for the CA'S to the folder "admincerts", this corresponds to the admin of the organization 1 btw.
+11. Put the config.yaml files for MSP identification inside of the tls-msp and msp that we have created so far
 
-Notes about the keys:
-- Because we generated tls certificate with tls profile we will have a certificate in the tls directory representing the root tls CA.
-- We will have a cert and a key inside of signcert and keystore, which represent the tls certificate for the peer1
-- Dont forget to rename the private key to key.pem, for becoming easy to get in the configuration
+Note that, for the tls-msp we have a file that already configed inside of /orderer-config-files/NodeOUS/tls-msp/ and for the msp we have a file in /orderer-config-files/NodeOUS/msp/
 
-## 4 - Do the same thing for the peer2, changing of course the profiles (the organization remains the same)
+This files will map, which OUS correspond to a certain rule inside of the MSP(client,admin,peer,orderer). Also, we provide the certificate of the Root CA that issued those certificates. The OUS, are defined in the csr.names or id.type or even id.affiliation. (Eg: csr.names "OU=something",--id.type admin, --id.affiliation Org1.nurse)
+- With the csr.names we can put whatever we want in terms of OU's
+- id.type we can only put those 4 roles (client,admin,peer,orderer)
+- id.affiliation it puts the OUS relative to a certain hierarchy, for example in case of the Org1.nurse, it would create 2 OUs (Org1 and nurse) 
+## 3 - Create the peer configuration
+Well , in order to config the peer we need to create a file called core.yaml. To do so, we need to grab a template from the internet and config it. We already did that, it is on the peer-config-files. Also, there are comments about every field that we can see much better with better comments extension of vscode. Note that in order for everything works well, you need to check the notes relative to the couchdb, otherwise it will fail to run.
+
+1. Copy the core.yaml to the config/ folder 
+## 4 - Do the same thing for the peer2, changing of course the profiles (the organization remains the same) 
+In my config, in the affiliations instead of Org1.doctor, i putter Org1.nurse in peer2
 ## 5 - Start the containers with the following configuration:
-Note , you change the CORE_PEER_GOSSIP_EXTERNALENDPOINT which is the ip address that identifies you in a certain network for server discovery, name of the peer, the peer id and the CORE_PEER_GOSSIP_BOOTSTRAP
+You can run this in a bash script
 ```
+#!/bin/bash
+
 docker run \
   --name peer1 \
   -p 7051:7051 \
-  -e CORE_PEER_ID=peer1 \
-  -e CORE_PEER_ADDRESS=127.0.0.1:7051 \
-  -e CORE_PEER_LOCALMSPID=org1MSP \
-  -e CORE_PEER_MSPCONFIGPATH=/tmp/hyperledger/org1/peer1/msp \
+  -e FABRIC_CFG_PATH=/tmp/hyperledger/org1/peer1/config\
   -e CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock \
-  -e CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=guide_fabric-ca \
   -e FABRIC_LOGGING_SPEC=debug \
-  -e CORE_PEER_TLS_ENABLED=true \
-  -e CORE_PEER_TLS_CERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/signcerts/cert.pem \
-  -e CORE_PEER_TLS_KEY_FILE=/tmp/hyperledger/org1/peer1/tls-msp/keystore/key.pem \
-  -e CORE_PEER_TLS_ROOTCERT_FILE=/tmp/hyperledger/org1/peer1/tls-msp/tlscacerts/tls-192-168-1-78-7777.pem \
-  -e CORE_PEER_GOSSIP_USELEADERELECTION=true \
-  -e CORE_PEER_GOSSIP_ORGLEADER=false \
-  -e CORE_PEER_GOSSIP_EXTERNALENDPOINT=192.168.1.100:7051 \
-  -e CORE_PEER_GOSSIP_BOOTSTRAP=192.168.1.140:7051 \
   -e CORE_PEER_GOSSIP_SKIPHANDSHAKE=true \
   -v /var/run:/host/var/run \
   -v /root/go-workspace/src/github.com/pedromnchunks/deploy-peer:/tmp/hyperledger/org1/peer1 \
-  -w /opt/gopath/src/github.com/hyperledger/fabric/org1/peer1 \
+  -w /tmp/hyperledger/org1/peer1\
    hyperledger/fabric-peer
 ```
- 
+For more info check out the vm-files/peer1/deploy-peer, thats exacly how it becomes after this steps and other more (there are steps from other notes, but you get the idea by looking into it)

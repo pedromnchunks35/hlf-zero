@@ -14,7 +14,7 @@
 General:
     ##! FOR NOW IS LOCALHOST BUT LATER ON IT WILL BE ANOTHER THING, SOMETHING LIKE A DNS RESOLUTION
     # Listen address: The IP on which to bind to listen.
-    ListenAddress: 127.0.0.1
+    ListenAddress: 0.0.0.0
 
     # Listen port: The port on which to bind to listen.
     ListenPort: 7050
@@ -110,14 +110,14 @@ General:
     # LocalMSPDir is where to find the private crypto material needed by the
     # orderer. It is set relative here as a default for dev environments but
     # should be changed to the real location in production.
-    LocalMSPDir: /tmp/hyperledger/deploy-orderer/org1/orderer/msp/
-    #! THIS IS THE ID OF THE LOCAL MSP OF THE ORDERER
+    LocalMSPDir: /tmp/hyperledger/deploy-orderer/org1/orderer/msp
+    #! THIS IS THE ID OF THE LOCAL MSP OF THE ORDERER (WE SHOULD PUT THE MSP OF THE ORGANIZATION, OTHERWISE IT WILL FAIL IN THE COMMUNICATION)
     # LocalMSPID is the identity to register the local MSP material with the MSP
     # manager. IMPORTANT: The local MSP ID of an orderer needs to match the MSP
     # ID of one of the organizations defined in the orderer system channel's
     # /Channel/Orderer configuration. The sample organization defined in the
     # sample configuration provided has an MSP ID of "SampleOrg".
-    LocalMSPID: OrdererMSP
+    LocalMSPID: Org1MSP
 
     # Enable an HTTP service for Go "pprof" profiling as documented at:
     # https://golang.org/pkg/net/http/pprof

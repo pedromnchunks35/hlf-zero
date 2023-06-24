@@ -1,6 +1,7 @@
 To init the couchdb we need to:
 - Pull the image
 - Run the image passing the credentials and volume of the data
+For peer1:
 ```
 sudo docker run \
     -p 5989:5984 \
@@ -10,7 +11,7 @@ sudo docker run \
     -v /home/pedromn35/go/src/github.com/pedromnchunks35/hlf-zero/couchdb-persist/peer1/:/opt/couchdb/data \
     --name couch-peer1 \
     couchdb
-
+(THIS IS AFTER THE CONTAINER IS UP, IN A NORMAL CONSOLE)
 curl -X PUT http://admin:12341234@localhost:5989/_users
 curl -X PUT http://admin:12341234@127.0.0.1:5989/_replicator
 curl -X PUT http://admin:12341234@localhost:5989/_global_changes
@@ -25,7 +26,7 @@ sudo docker run \
     -v /home/pedromn35/go/src/github.com/pedromnchunks35/hlf-zero/couchdb-persist/peer2/:/opt/couchdb/data \
     --name couch-peer2 \
     couchdb
-
+(THIS IS AFTER THE CONTAINER IS UP, IN A NORMAL CONSOLE)
 curl -X PUT http://admin:12341234@localhost:5990/_users
 curl -X PUT http://admin:12341234@127.0.0.1:5990/_replicator
 curl -X PUT http://admin:12341234@localhost:5990/_global_changes

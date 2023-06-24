@@ -4,8 +4,9 @@ As we know, the disposition of the configuration depends always of the person th
 The configuration that i will make will be something like this:
 ```
 deploy-orderer
+ ├── blocks
  ├── ledger-vault (this is where the ledger data will be stored)
- ├── admin-client (client for the CA to retrieve every cryptographic material 
+ ├── client-ca (client for the CA to retrieve every cryptographic material 
  │    │            we need)
  │    └── tls-cas
  │         ├── int-root-ca.pem (tls certificate for the Intermediate CA)
@@ -14,6 +15,7 @@ deploy-orderer
  └── org1 
       ├── msp
       │    ├── cacerts
+      │    ├── intermediacerts
       │    └── tlscacerts
       └── orderer
            ├── msp
@@ -48,13 +50,17 @@ fabric-ca-client register -d -u https://localhost:7779 --id.name orderer --id.se
 ```
 fabric-ca-client enroll -d -u https://orderer:12341234@192.168.1.78:7779  --id.type orderer --csr.cn orderer --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.hosts "192.168.1.101,orderer,127.0.0.1,localhost" --tls.certfiles tls-cas/int-root-ca.pem --mspdir ../org1/orderer/msp 
 ```
+## 6. Enroll the admin tls inside of the ca-client
+```
+fabric-ca-client enroll -d -u https://adm:12341234@localhost:7777  --id.type admin --id.affiliation org1 --csr.names  "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir tls-msp/admin/msp
+```
 ## 6. Place once again the config.yaml for the NodeOUS inside of this local msp of the orderer (it is the secound, the first got placed in the org msp)
-## 7. Place a config.yaml inside of the tls-msp of the orderer
-## 8. Make the configuration of the orderer.yaml (we will place it inside of config). We have a configuration inside of orderer-config-files
+## 7. Place a config.yaml inside of the tls-msp of the orderer (also, put inside of the tls-msp of the admin)
+## 8. Make the configuration of the orderer.yaml (we will place it inside of config). We have a configuration inside of orderer-config-files, note that every possible note is there about the configuration and you can see better which comments are more relevant if you have the extension better comments
 ## 9. Place this script and run it 
 -> 7050 is the port of the orderer
 
--> 9443 is the port for the api that the admin will access to create the channel 
+-> 7053 is the port for the api that the admin will access to create the channel 
 
 -> We will create a volume that will retain everything in -v 
 
