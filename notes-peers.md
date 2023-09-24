@@ -43,15 +43,15 @@ fabric-ca-client register -d -u https://localhost:7779 --id.name adm-iter --id.s
 ```
 9. Enroll the adm identity for the intermediate CA
 ```
-fabric-ca-client enroll -d -u https://adm-iter:12341234@localhost:7779 --id.type admin --id.affiliation org1 --csr.names --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir msp/admin/msp
+fabric-ca-client enroll -d -u https://adm-iter:12341234@localhost:7779 --id.type admin --id.affiliation org1  --csr.names "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir msp/admin/msp
 ```
 8. Register the adm identity for tls CA
 ```
-fabric-ca-client register -d -u https://localhost:7777 --id.name adm --id.secret 12341234 --id.type admin --id.affiliation org1 --csr.names  "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir int-ca/iteradm/msp/
+fabric-ca-client register -d -u https://localhost:7777 --id.name adm --id.secret 12341234 --id.type admin --id.affiliation org1 --csr.names  "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir tls-ca/iteradm/msp/ --enrollment.profile tls
 ```
 9. Enroll the adm identity for tls CA
 ```
-fabric-ca-client enroll -d -u https://adm:12341234@localhost:7777  --id.type admin --id.affiliation org1 --csr.names  "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-root-cert.pem --mspdir tls-msp/admin/msp
+fabric-ca-client enroll -d -u https://adm:12341234@localhost:7777  --id.type admin --id.affiliation org1 --csr.names  "C=PT,ST=Porto,L=Aliados,O=Universidade do minho" --csr.cn peer1  --tls.certfiles tls-root-cert/tls-ca-cert.pem --mspdir ../../cryptographic-materials/peer1/tls-msp-admin --enrollment.profile tls
 ```
 10. Extract chaincode-go from fabric-samples
 Go to asset-transfer-basic/chaincode-go and run this command
