@@ -13,15 +13,15 @@
 #
 ################################################################################
 Organizations:
-    - &Org1
+    - &Orgz
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org1
+        Name: OrgzMSP
 
         # ID to load the MSP definition as
-        ID: Org1MSP
+        ID: OrgzMSP
 
-        MSPDir: ../org1/msp
+        MSPDir: ../../org/orgz/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -29,28 +29,93 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client','Org1MSP.orderer')"
+                Rule: "OR('OrgzMSP.admin', 'OrgzMSP.peer', 'OrgzMSP.client','OrgzMSP.orderer')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin', 'Org1MSP.client','Org1MSP.peer','Org1MSP.orderer')"
+                Rule: "OR('OrgzMSP.admin', 'OrgzMSP.client','OrgzMSP.peer','OrgzMSP.orderer')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin')"
+                Rule: "OR('OrgzMSP.admin')"
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org1MSP.peer')"
+                Rule: "OR('OrgzMSP.peer')"
 
         OrdererEndpoints:
-            - 192.168.1.101:7050 
+            - CHP-SRVAIDA69.chuporto.min-saude.pt:7779
 
         # Anchor peers
         AnchorPeers:
-            - Host: 192.168.1.100
-              Port: 7051
-            - Host: 192.168.1.140
-              Port: 7051
-            
+            - Host: CHP-SRVAIDA69.chuporto.min-saude.pt
+              Port: 7780
+            - Host: CHP-SRVAIDA69.chuporto.min-saude.pt
+              Port: 7781
+    - &Orgn
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: OrgnMSP
 
+        # ID to load the MSP definition as
+        ID: OrgnMSP
+
+        MSPDir: ../../org/orgn/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrgnMSP.admin', 'OrgnMSP.peer', 'OrgnMSP.client','OrgnMSP.orderer')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrgnMSP.admin', 'OrgnMSP.client','OrgnMSP.peer','OrgnMSP.orderer')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrgnMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('OrgnMSP.peer')"
+
+        OrdererEndpoints:
+            - CHP-SRVAIDA70.chuporto.min-saude.pt:7780
+
+        # Anchor peers
+        AnchorPeers:
+            - Host: CHP-SRVAIDA70.chuporto.min-saude.pt
+              Port: 7777
+            - Host: CHP-SRVAIDA70.chuporto.min-saude.pt
+              Port: 7778
+            - Host: CHP-SRVAIDA70.chuporto.min-saude.pt
+              Port: 7779
+    - &Orgr
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: OrgrMSP
+
+        # ID to load the MSP definition as
+        ID: OrgrMSP
+
+        MSPDir: ../../org/orgr/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrgrMSP.admin', 'OrgrMSP.peer', 'OrgrMSP.client','OrgrMSP.orderer')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrgrMSP.admin', 'OrgrMSP.client','OrgrMSP.peer','OrgrMSP.orderer')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrgrMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('OrgrMSP.peer')"
+
+        OrdererEndpoints:
+            - CHP-SRVAIDA70.chuporto.min-saude.pt:7784
 ################################################################################
 #
 #   SECTION: Capabilities
@@ -119,7 +184,9 @@ Application: &ApplicationDefaults
     # Organizations is the list of orgs which are defined as participants on
     # the application side of the network
     Organizations:
-        - *Org1
+        - *Orgz
+        - *Orgn
+        - *Orgr
     # Policies defines the set of policies at this level of the config tree
     # For Application policies, their canonical path is
     #   /Channel/Application/<PolicyName>
@@ -132,13 +199,13 @@ Application: &ApplicationDefaults
             Rule: "ANY Writers"
         Admins:
             Type: ImplicitMeta
-            Rule: "MAJORITY Admins"
+            Rule: "ANY Admins"
         LifecycleEndorsement:
             Type: ImplicitMeta
-            Rule: "MAJORITY Endorsement"
+            Rule: "ANY Endorsement"
         Endorsement:
             Type: ImplicitMeta
-            Rule: "MAJORITY Endorsement"
+            Rule: "ANY Endorsement"
     Capabilities: *ApplicationCapabilities
 ################################################################################
 #
@@ -158,14 +225,24 @@ Orderer: &OrdererDefaults
     # as TLS validation.  The preferred way to specify orderer addresses is now
     # to include the OrdererEndpoints item in your org definition
     Addresses:
-        - 192.168.1.101:7050 
+        - CHP-SRVAIDA69.chuporto.min-saude.pt:7779
+        - CHP-SRVAIDA70.chuporto.min-saude.pt:7780
+        - CHP-SRVAIDA70.chuporto.min-saude.pt:7784
 
     EtcdRaft:
         Consenters:
-        - Host: 192.168.1.101
-          Port: 7050
-          ClientTLSCert: ../org1/orderer/tls-msp/signcerts/cert.pem
-          ServerTLSCert: ../org1/orderer/tls-msp/signcerts/cert.pem
+        - Host: CHP-SRVAIDA69.chuporto.min-saude.pt
+          Port: 7779
+          ClientTLSCert: ../../tls-msp/signcerts/cert.pem
+          ServerTLSCert: ../../tls-msp/signcerts/cert.pem
+        - Host: CHP-SRVAIDA70.chuporto.min-saude.pt
+          Port: 7780
+          ClientTLSCert: ../../msp-other-orderers/orgn/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ../../msp-other-orderers/orgn/tls-msp/signcerts/cert.pem
+        - Host: CHP-SRVAIDA70.chuporto.min-saude.pt
+          Port: 7784
+          ClientTLSCert: ../../msp-other-orderers/orgr/tls-msp/signcerts/cert.pem
+          ServerTLSCert: ../../msp-other-orderers/orgr/tls-msp/signcerts/cert.pem
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
@@ -188,7 +265,9 @@ Orderer: &OrdererDefaults
     # Organizations is the list of orgs which are defined as participants on
     # the orderer side of the network
     Organizations:
-        - *Org1
+        - *Orgz
+        - *Orgn
+        - *Orgr
     # Policies defines the set of policies at this level of the config tree
     # For Orderer policies, their canonical path is
     #   /Channel/Orderer/<PolicyName>
@@ -201,7 +280,7 @@ Orderer: &OrdererDefaults
             Rule: "ANY Writers"
         Admins:
             Type: ImplicitMeta
-            Rule: "MAJORITY Admins"
+            Rule: "ANY Admins"
         # BlockValidation specifies what signatures must be included in the block
         # from the orderer for the peer to validate it.
         BlockValidation:
@@ -233,7 +312,7 @@ Channel: &ChannelDefaults
         # By default, who may modify elements at this config level
         Admins:
             Type: ImplicitMeta
-            Rule: "MAJORITY Admins"
+            Rule: "ANY Admins"
 
     # Capabilities describes the channel level capabilities, see the
     # dedicated Capabilities section elsewhere in this file for a full

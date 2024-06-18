@@ -31,7 +31,7 @@ fabric-ca-client enroll -d -u https://adm-orderer:12341234@192.168.1.78:7777  --
 
 Inside of the client-ca dir:
 ```
-./osnadmin channel join --channelID channel1 --config-block ../blocks/genesis_block.pb -o 127.0.0.1:7053 --ca-file tls-msp/admin/msp/tlscacerts/tls-192-168-1-78-7777.pem --client-cert tls-msp/admin/msp/signcerts/cert.pem --client-key tls-msp/admin/msp/keystore/key.pem
+./osnadmin channel join --channelID channel1 --config-block ../blocks/genesis_block.pb -o localhost:7053 --ca-file tls-msp/admin/msp/tlscacerts/tls-192-168-1-78-7777.pem --client-cert tls-msp/admin/msp/signcerts/cert.pem --client-key tls-msp/admin/msp/keystore/key.pem
 ```
 This will return a map saying that the block heigth is 1
 
@@ -96,7 +96,7 @@ Example:
 peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name basic --version 1.0 --sequence 1 --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt"
 ```
 
-To veify if it got commited or not you need to run the following:
+To verify if it got commited or not you need to run the following:
 
 ```
 peer chaincode invoke -o 192.168.1.101:7050 --tls --cafile ../ca-client/tls-msp/admin/msp/tlscacerts/tls-192-168-1-78-7777.pem --certfile ../ca-client/tls-msp/admin/msp/signcerts/cert.pem --keyfile ../ca-client/tls-msp/admin/msp/keystore/key.pem -C channel1 -n basic --peerAddresses 192.168.1.100:7051 --tlsRootCertFiles ../ca-client/tls-msp/admin/msp/tlscacerts/tls-192-168-1-78-7777.pem -c '{"function":"InitLedger","Args":[]}'
